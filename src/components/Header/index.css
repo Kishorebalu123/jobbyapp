@@ -1,0 +1,13 @@
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.nav-menu {
+  display: flex;
+  list-style-type: none;
+}
+
+.website-logo {
+  width: 50%;
+}

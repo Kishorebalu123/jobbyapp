@@ -1,0 +1,16 @@
+.bg-card {
+  background-color: black;
+  display: flex;
+
+  background-size: cover;
+}
+.bg-profile {
+  padding: 10px;
+  width: 250px;
+}
+.bg-jobs {
+  width: 500px;
+}
+.search-input {
+  background-color: transparent;
+}
