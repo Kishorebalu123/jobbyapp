@@ -31,6 +31,7 @@ class Jobs extends Component {
     profileDetails: [],
     profileApiStatus: profileApiStatusConstants.initial,
     jobsApiStatus: jobsApiStatusConstants.initial,
+    isChecked: false,
   }
 
   componentDidMount() {
@@ -72,6 +73,7 @@ class Jobs extends Component {
     this.setState({jobsApiStatus: jobsApiStatusConstants.inProgress})
     const token = Cookies.get('jwt_token')
     const {activeEmploymentType, activeSalaryRange, searchInput} = this.state
+
     const url = `https://apis.ccbp.in/jobs?employment_type=${activeEmploymentType}&minimum_package=${activeSalaryRange}&search=${searchInput}`
     const options = {
       method: 'GET',
@@ -93,7 +95,7 @@ class Jobs extends Component {
         rating: each.rating,
         title: each.title,
       }))
-      //   console.log(updatedData)
+
       this.setState({
         jobsList: updatedData,
         jobsApiStatus: jobsApiStatusConstants.success,
@@ -122,25 +124,44 @@ class Jobs extends Component {
 
   renderFailureView = () => (
     <div>
-      <h1>failure</h1>
+      <img
+        className=""
+        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+        alt="failure view"
+      />
+      <h1>Oops! Somthing Went Worng</h1>
+      <p>We cannot seem to find the page you are looking for.</p>
+      <button onClick={this.renderJobsApi} type="button">
+        Retry
+      </button>
     </div>
   )
 
+  renderProfileApi = () => {
+    this.getProfileApi()
+  }
+
+  renderJobsApi = () => {
+    this.getJobsApi()
+  }
+
   renderProfileFailureView = () => (
     <div>
-      <h1>profilefailure</h1>
+      <button onClick={this.renderProfileApi} type="button">
+        Retry
+      </button>
     </div>
   )
 
   renderJobsSection = () => {
     const {jobsApiStatus} = this.state
     switch (jobsApiStatus) {
-      case 'SUCCESS':
+      case jobsApiStatusConstants.success:
         return this.renderGetJobs()
 
-      case 'FAILURE':
+      case jobsApiStatusConstants.failure:
         return this.renderFailureView()
-      case 'IN_PROGRESS':
+      case jobsApiStatusConstants.inProgress:
         return this.renderLoadingView()
       default:
         return null
@@ -150,12 +171,12 @@ class Jobs extends Component {
   renderProfileSection = () => {
     const {profileApiStatus} = this.state
     switch (profileApiStatus) {
-      case 'SUCCESS':
+      case profileApiStatusConstants.success:
         return this.renderGetProfile()
 
-      case 'FAILURE':
+      case profileApiStatusConstants.failure:
         return this.renderProfileFailureView()
-      case 'IN_PROGRESS':
+      case profileApiStatusConstants.inProgress:
         return this.renderLoadingView()
       default:
         return null
@@ -188,6 +209,7 @@ class Jobs extends Component {
 
   changeEmploymentType = activeEmploymentType => {
     this.setState({activeEmploymentType}, this.getJobsApi)
+    this.setState(prevState => ({isChecked: !prevState.isChecked}))
   }
 
   changeSalaryRange = activeSalaryRange => {

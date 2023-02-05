@@ -78,7 +78,16 @@ class JobItemDetails extends Component {
 
   renderFailureView = () => (
     <div>
-      <h1>failure</h1>
+      <img
+        className=""
+        src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+        alt="failure view"
+      />
+      <h1>Oops! Somthing Went Worng</h1>
+      <p>We cannot seem to find the page you are looking for.</p>
+      <button onClick={this.renderJobsApi} type="button">
+        Retry
+      </button>
     </div>
   )
 
