@@ -2,6 +2,8 @@ import {Component} from 'react'
 import Loader from 'react-loader-spinner'
 import Cookies from 'js-cookie'
 import SimilarJobs from '../SimilarJobs'
+import Skills from '../Skills'
+import Header from '../Header'
 import './index.css'
 
 const apiStatusConstants = {
@@ -15,6 +17,8 @@ class JobItemDetails extends Component {
   state = {
     jobDetails: [],
     similarJobs: [],
+    skills: [],
+    lifeAtCompany: [],
     apiStatus: apiStatusConstants.initial,
   }
 
@@ -52,7 +56,7 @@ class JobItemDetails extends Component {
         location: jobDetails.location,
         packagePerAnnum: jobDetails.package_per_annum,
         rating: jobDetails.rating,
-        //   skills: jobDetails.skills,
+        //  skills: jobDetails.skills,
         title: jobDetails.title,
       }
       //    console.log(updatedData)
@@ -66,9 +70,21 @@ class JobItemDetails extends Component {
         title: each.title,
       }))
 
+      const updateSkills = fetchedData.job_details.skills.map(each => ({
+        name: each.name,
+        imageUrl: each.image_url,
+      }))
+
+      const updateLifeAtCompany = {
+        description: fetchedData.job_details.life_at_company.description,
+        imageUrl: fetchedData.job_details.life_at_company.image_url,
+      }
+
       this.setState({
         jobDetails: updatedData,
         similarJobs: updateSimilarJobs,
+        skills: updateSkills,
+        lifeAtCompany: updateLifeAtCompany,
         apiStatus: apiStatusConstants.success,
       })
     } else {
@@ -83,9 +99,9 @@ class JobItemDetails extends Component {
         src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
         alt="failure view"
       />
-      <h1>Oops! Somthing Went Worng</h1>
+      <h1>Oops! Something Went Wrong</h1>
       <p>We cannot seem to find the page you are looking for.</p>
-      <button onClick={this.renderJobsApi} type="button">
+      <button onClick={this.getJobData} type="button">
         Retry
       </button>
     </div>
@@ -98,25 +114,24 @@ class JobItemDetails extends Component {
   )
 
   renderJobDetails = () => {
-    const {jobDetails, similarJobs} = this.state
+    const {jobDetails, similarJobs, skills, lifeAtCompany} = this.state
     const {
       companyLogoUrl,
-      //  companyWebsiteUrl,
+      companyWebsiteUrl,
       employmentType,
       jobDescription,
-      //    lifeAtCompany,
       location,
       packagePerAnnum,
       rating,
-      // skills,
+
       title,
     } = jobDetails
 
     return (
-      <>
+      <div>
         <div>
           <div>
-            <img src={companyLogoUrl} alt="" />
+            <img src={companyLogoUrl} alt="job details company logo" />
             <div>
               <h1>{title}</h1>
               <p>{rating}</p>
@@ -127,30 +142,35 @@ class JobItemDetails extends Component {
             <p>{employmentType}</p>
             <p>{packagePerAnnum}</p>
           </div>
-
-          <p>Description</p>
-          <p>{jobDescription}</p>
-          {/*      <p>Skills</p>
-        <p>{skills}</p>
-        <div>
           <div>
-            <p>Life at Company</p>
-            <p>{lifeAtCompany}</p>
+            <h1>Description</h1>
+            <a href={companyWebsiteUrl} target="_blank" rel="noreferrer">
+              Visit
+            </a>
           </div>
-          <img src={companyWebsiteUrl} alt="" />
-        </div>
-        */}
+          <p>{jobDescription}</p>
+          <ul>
+            <h1>Skills</h1>
+            {skills.map(eachSkill => (
+              <Skills skill={eachSkill} key={eachSkill.name} />
+            ))}
+          </ul>
+          <h1>Life at Company </h1>
+          <div>
+            <p>{lifeAtCompany.description}</p>
+            <img src={lifeAtCompany.imageUrl} alt="life at company" />
+          </div>
         </div>
 
         <div>
-          <h1>Similar Jobs</h1>
           <ul>
+            <h1>Similar Jobs</h1>
             {similarJobs.map(eachItem => (
               <SimilarJobs similarJob={eachItem} key={eachItem.id} />
             ))}
           </ul>
         </div>
-      </>
+      </div>
     )
   }
 
@@ -171,7 +191,12 @@ class JobItemDetails extends Component {
 
   render() {
     //   console.log(similarJobs)
-    return <div>{this.renderJobSection()}</div>
+    return (
+      <div data-testid="loader">
+        <Header />
+        <div>{this.renderJobSection()}</div>
+      </div>
+    )
   }
 }
 

@@ -32,7 +32,7 @@ const JobCard = props => {
             <p>{packagePerAnnum}</p>
           </div>
           <hr />
-          <p>Description</p>
+          <h1>Description</h1>
           <p>{jobDescription}</p>
         </div>
       </li>

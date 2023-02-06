@@ -25,13 +25,14 @@ const profileApiStatusConstants = {
 class Jobs extends Component {
   state = {
     searchInput: '',
-    activeEmploymentType: '',
+
     activeSalaryRange: '',
     jobsList: [],
     profileDetails: [],
     profileApiStatus: profileApiStatusConstants.initial,
     jobsApiStatus: jobsApiStatusConstants.initial,
-    isChecked: false,
+
+    employmentTypes: [],
   }
 
   componentDidMount() {
@@ -72,9 +73,9 @@ class Jobs extends Component {
   getJobsApi = async () => {
     this.setState({jobsApiStatus: jobsApiStatusConstants.inProgress})
     const token = Cookies.get('jwt_token')
-    const {activeEmploymentType, activeSalaryRange, searchInput} = this.state
-
-    const url = `https://apis.ccbp.in/jobs?employment_type=${activeEmploymentType}&minimum_package=${activeSalaryRange}&search=${searchInput}`
+    const {activeSalaryRange, searchInput, employmentTypes} = this.state
+    // console.log(activeSalaryRange)
+    const url = `https://apis.ccbp.in/jobs?employment_type=${employmentTypes.join()}&minimum_package=${activeSalaryRange}&search=${searchInput}`
     const options = {
       method: 'GET',
       headers: {
@@ -113,12 +114,19 @@ class Jobs extends Component {
 
   renderGetJobs = () => {
     const {jobsList} = this.state
-    return (
+    const showNoJobsView = jobsList.length > 0
+    return showNoJobsView ? (
       <ul>
         {jobsList.map(eachJob => (
           <JobCard jobCard={eachJob} key={eachJob.id} />
         ))}
       </ul>
+    ) : (
+      <div>
+        <img src="" alt="no jobs" />
+        <h1>No Jobs Found</h1>
+        <p>We could not find any jobs. Try other filters</p>
+      </div>
     )
   }
 
@@ -129,7 +137,7 @@ class Jobs extends Component {
         src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
         alt="failure view"
       />
-      <h1>Oops! Somthing Went Worng</h1>
+      <h1>Oops! Something Went Wrong</h1>
       <p>We cannot seem to find the page you are looking for.</p>
       <button onClick={this.renderJobsApi} type="button">
         Retry
@@ -188,7 +196,7 @@ class Jobs extends Component {
     const {name, profileImageUrl, shortBio} = profileDetails
     return (
       <div>
-        <img src={profileImageUrl} alt="" />
+        <img src={profileImageUrl} alt="profile" />
         <h1>{name}</h1>
         <p>{shortBio}</p>
       </div>
@@ -208,8 +216,21 @@ class Jobs extends Component {
   }
 
   changeEmploymentType = activeEmploymentType => {
-    this.setState({activeEmploymentType}, this.getJobsApi)
-    this.setState(prevState => ({isChecked: !prevState.isChecked}))
+    // const isChecked=false
+    const {employmentTypes} = this.state
+    //  this.setState(prevState => ({isChecked: !prevState.isChecked}))
+    // const employmentTypes = employmentTypes
+    if (employmentTypes.includes(activeEmploymentType)) {
+      employmentTypes.filter(each => each !== activeEmploymentType)
+      this.setState({employmentTypes}, this.getJobsApi)
+    } else {
+      this.setState(
+        prevState => ({
+          employmentTypes: [...prevState.employmentTypes, activeEmploymentType],
+        }),
+        this.getJobsApi,
+      )
+    }
   }
 
   changeSalaryRange = activeSalaryRange => {
@@ -220,7 +241,7 @@ class Jobs extends Component {
     const {searchInput, activeEmploymentType, activeSalaryRange} = this.state
     //  console.log(searchInput)
     return (
-      <>
+      <div data-testid="loader">
         <Header />
         <div className="bg-card">
           <div className="bg-profile">
@@ -254,7 +275,7 @@ class Jobs extends Component {
             <div>{this.renderJobsSection()}</div>
           </div>
         </div>
-      </>
+      </div>
     )
   }
 }

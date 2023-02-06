@@ -75,8 +75,14 @@ const FilterJobs = props => {
         activeSalaryRangeId === salary.salaryRangeId ? `active-salary` : ``
       return (
         <li key={salary.salaryRangeId} onClick={onClickSalaryRange}>
-          <input className={salaryClassName} type="radio" name="salary" />
-          <label htmlFor={salary.label}>{salary.label}</label>
+          <input
+            className={salaryClassName}
+            value={salary.salaryRangeId}
+            type="radio"
+            name="salary"
+            id={salary.salaryRangeId}
+          />
+          <label htmlFor={salary.salaryRangeId}>{salary.label}</label>
         </li>
       )
     })
@@ -84,7 +90,7 @@ const FilterJobs = props => {
 
   const renderEmploymentType = () => (
     <div>
-      <h1>Employment Type</h1>
+      <h1>Type of Employment </h1>
       <ul>{renderFilterEmploymentType()}</ul>
     </div>
   )
